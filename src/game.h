@@ -16,6 +16,10 @@
 #include "npc.h"
 #include "wildcardtree.h"
 #include "quests.h"
+#include <unordered_map>
+#include <map>
+#include <forward_list>
+#include <mutex>
 
 class ServiceManager;
 class Creature;
@@ -553,6 +557,7 @@ class Game
 		std::unordered_map<uint32_t, market_offer> offerSend;
 		std::vector<Item*> subOfferSend;
 		std::unordered_map<std::string, std::unordered_map<uint32_t, market_offer>> marketing;
+		std::mutex marketingMutex;
 
 		std::list<Item*> decayItems[EVENT_DECAY_BUCKETS];
 		std::list<Creature*> checkCreatureLists[EVENT_CREATURECOUNT];

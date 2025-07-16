@@ -7,7 +7,7 @@ local marketing_area = {
 	{["init"] = {x = 32343, y = 32217, z = 4}, ["end"] = {x = 32355, y = 32232, z = 4}}, -- Thais
 	{["init"] = {x = 32677, y = 31682, z = 2}, ["end"] = {x = 32683, y = 31690, z = 2}}, -- Ab
 	{["init"] = {x = 32677, y = 31682, z = 1}, ["end"] = {x = 32683, y = 31690, z = 1}}, -- Ab
-	-- Adicionar área que inclui PZ (Thais Temple)
+	-- Adicionar Ã¡rea que inclui PZ (Thais Temple)
 	{["init"] = {x = 32360, y = 32210, z = 7}, ["end"] = {x = 32370, y = 32220, z = 7}}, -- Thais Temple PZ
 }
 
@@ -266,7 +266,7 @@ function creatureEvent.onExtendedOpcode(player, opcode, buffer)
 				return result
 			end
 
-				-- Permitir criação do Market em qualquer lugar (incluindo PZ)
+				-- Permitir criaÃ§Ã£o do Market em qualquer lugar (incluindo PZ)
 				local inMarketArea = true
 				
 				local randomPos = {
@@ -307,7 +307,7 @@ function creatureEvent.onExtendedOpcode(player, opcode, buffer)
 					market:setMarketDescription(formatMarketDescription(buffer_decode.description))
 					player:remove()
 				else
-					-- Tentar criar em uma posição diferente se falhar
+					-- Tentar criar em uma posiÃ§Ã£o diferente se falhar
 					local altPos = Position(player:getPosition().x + 1, player:getPosition().y, player:getPosition().z)
 					local marketAlt = Game.createMonster("Market", altPos, true, true)
 					if marketAlt then

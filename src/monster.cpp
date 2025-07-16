@@ -2,12 +2,18 @@
 // Use of this source code is governed by the GPL-2.0 License that can be found in the LICENSE file.
 
 #include "otpch.h"
-
+#include <string>
+#include <vector>
+#include <list>
+#include <unordered_set>
+#include <unordered_map>
+#include <iostream>
 #include "monster.h"
 #include "game.h"
 #include "spells.h"
 #include "events.h"
 #include "configmanager.h"
+#include "luascript.h"
 
 extern Game g_game;
 extern Monsters g_monsters;
@@ -69,10 +75,7 @@ void Monster::removeList()
 
 const std::string& Monster::getName() const
 {
-	if (name.empty()) {
-		return mType->name;
-	}
-	return name;
+	return customName.empty() ? mType->name : customName;
 }
 
 void Monster::setName(const std::string& newName)
