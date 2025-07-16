@@ -232,8 +232,8 @@ class ProtocolGame final : public Protocol
 
 		void sendAddTileItem(const Position& pos, uint32_t stackpos, const Item* item);
 		void sendUpdateTileItem(const Position& pos, uint32_t stackpos, const Item* item);
-		void sendRemoveTileThing(const Position& pos, uint32_t stackpos);
 		void sendUpdateTileCreature(const Position& pos, uint32_t stackpos, const Creature* creature);
+		void sendRemoveTileThing(const Position& pos, uint32_t stackpos);
 		void sendRemoveTileCreature(const Creature* creature, const Position& pos, uint32_t stackpos);
 		void sendUpdateTile(const Tile* tile, const Position& pos);
 

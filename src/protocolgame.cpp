@@ -2482,6 +2482,7 @@ void ProtocolGame::sendEnterWorld()
 	writeToOutputBuffer(msg);
 }
 
+
 void ProtocolGame::sendFightModes()
 {
 	NetworkMessage msg;
@@ -2947,6 +2948,7 @@ void ProtocolGame::AddCreature(NetworkMessage& msg, const Creature* creature, bo
 		msg.add<uint32_t>(creature->getID());
 		msg.addByte(creatureType);
 		msg.addString(creature->getName());
+		msg.addString(creature->getMonster() ? creature->getMarketDescription() : "");
 	}
 
 	if (creature->isHealthHidden()) {

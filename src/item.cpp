@@ -66,6 +66,10 @@ Item* Item::CreateItem(const uint16_t type, uint16_t count /*= 0*/)
 		} else {
 			newItem = new Item(type, count);
 		}
+		if (it.pickupable) {
+			newItem->setRealUID(g_game.nextItemUID());
+			g_game.addRealUniqueItem(newItem->getRealUID(), newItem);
+		}
 
 		newItem->incrementReferenceCounter();
 	}

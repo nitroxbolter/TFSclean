@@ -548,6 +548,8 @@ class LuaScriptInterface
 		// Game
 		static int luaGameGetSpectators(lua_State* L);
 		static int luaGameGetPlayers(lua_State* L);
+		static int luaGameGetNpcs(lua_State* L);
+		static int luaGameGetMonsters(lua_State* L);
 		static int luaGameLoadMap(lua_State* L);
 
 		static int luaGameGetExperienceStage(lua_State* L);
@@ -581,6 +583,18 @@ class LuaScriptInterface
 		static int luaGameGetClientVersion(lua_State* L);
 
 		static int luaGameReload(lua_State* L);
+
+		static int luaGameGetRealUniqueItem(lua_State* L);
+
+		static int luaGameGetItemTypeByClientId(lua_State* L);
+
+		// marketing
+		static int luaGameLoadMarketing(lua_State* L);
+		static int luaGameGetMarketingOffers(lua_State* L);
+		static int luaGameGetMarketingSubOffers(lua_State* L);
+		static int luaGameRemoveMarketingOffer(lua_State* L);
+		static int luaGameAddMarketingOffer(lua_State* L);
+		static int luaGameBuyMarketingOffer(lua_State* L);
 
 		static int luaGameGetAccountStorageValue(lua_State* L);
 		static int luaGameSetAccountStorageValue(lua_State* L);
@@ -753,6 +767,7 @@ class LuaScriptInterface
 		static int luaItemGetSpecialDescription(lua_State* L);
 
 		static int luaItemHasProperty(lua_State* L);
+		static int luaItemGetRealUID(lua_State * L);
 		static int luaItemIsLoadedFromMap(lua_State* L);
 
 		static int luaItemSetStoreItem(lua_State* L);
@@ -1070,6 +1085,10 @@ class LuaScriptInterface
 
 		static int luaMonsterIsWalkingToSpawn(lua_State* L);
 		static int luaMonsterWalkToSpawn(lua_State* L);
+		static int luaMonsterGetStar(lua_State* L);
+		static int luaMonsterSetStar(lua_State* L);
+
+		static int luaMonsterSetMarketDescription(lua_State* L);
 
 		// Npc
 		static int luaNpcCreate(lua_State* L);

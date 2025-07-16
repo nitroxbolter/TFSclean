@@ -937,6 +937,8 @@ MonsterType* Monsters::loadMonster(const std::string& file, const std::string& m
 				mType->info.canWalkOnFire = attr.as_bool();
 			} else if (strcasecmp(attrName, "canwalkonpoison") == 0) {
 				mType->info.canWalkOnPoison = attr.as_bool();
+			} else if (strcasecmp(attrName, "allowdoubleattack") == 0) {
+				mType->info.allowDoubleAttack = attr.as_bool();
 			} else {
 				std::cout << "[Warning - Monsters::loadMonster] Unknown flag attribute: " << attrName << ". " << file << std::endl;
 			}
@@ -1439,6 +1441,24 @@ void Monsters::loadLootContainer(const pugi::xml_node& node, LootBlock& lBlock)
 		if (loadLootItem(subNode, lootBlock)) {
 			lBlock.childLoot.emplace_back(std::move(lootBlock));
 		}
+	}
+}
+
+void Monster::setMarketDescription(const std::string& description)
+{
+	if (getMarketDescription() == description) {
+		return;
+	}
+
+	this->marketDescription = description;
+
+	// NOTE: Due to how client caches known creatures,
+	// it is not feasible to send creature update to everyone that has ever met it
+	SpectatorVec spectators;
+	g_game.map.getSpectators(spectators, position, true, true);
+	for (Creature* spectator : spectators) {
+		assert(dynamic_cast<Player*>(spectator) != nullptr);
+		static_cast<Player*>(spectator)->sendUpdateTileCreature(this);
 	}
 }
 

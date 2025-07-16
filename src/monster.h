@@ -52,12 +52,15 @@ class Monster final : public Creature
 		void removeList() override;
 
 		const std::string& getName() const override;
-		void setName(const std::string& name);
+		void setName(const std::string& newName);
 
 		const std::string& getNameDescription() const override;
-		void setNameDescription(const std::string& nameDescription) {
-			this->nameDescription = nameDescription;
-		};
+		void setNameDescription(const std::string& newNameDescription) {
+			nameDescription = newNameDescription;
+		}
+
+		const std::string& getMarketDescription() const override {return marketDescription;}
+		void setMarketDescription(const std::string& description);
 
 		std::string getDescription(int32_t) const override {
 			return nameDescription + '.';
@@ -171,9 +174,12 @@ class Monster final : public Creature
 	private:
 		CreatureHashSet friendList;
 		CreatureList targetList;
+		
 
 		std::string name;
 		std::string nameDescription;
+		std::string customName;
+		std::string marketDescription;
 
 		MonsterType* mType;
 		Spawn* spawn = nullptr;

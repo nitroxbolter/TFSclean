@@ -25,7 +25,8 @@ Monster* Monster::createMonster(const std::string& name)
 	if (!mType) {
 		return nullptr;
 	}
-	return new Monster(mType);
+	Monster* monster = new Monster(mType);
+	return monster;
 }
 
 Monster::Monster(MonsterType* mType) :
@@ -74,13 +75,13 @@ const std::string& Monster::getName() const
 	return name;
 }
 
-void Monster::setName(const std::string& name)
+void Monster::setName(const std::string& newName)
 {
-	if (getName() == name) {
+	if (getName() == newName) {
 		return;
 	}
 
-	this->name = name;
+	customName = newName;
 
 	// NOTE: Due to how client caches known creatures,
 	// it is not feasible to send creature update to everyone that has ever met it
@@ -100,6 +101,7 @@ const std::string& Monster::getNameDescription() const
 	}
 	return nameDescription;
 }
+
 
 bool Monster::canSee(const Position& pos) const
 {
@@ -640,7 +642,7 @@ BlockType_t Monster::blockHit(Creature* attacker, CombatType_t combatType, int32
 bool Monster::isTarget(const Creature* creature) const
 {
 	if (creature->isRemoved() || !creature->isAttackable() ||
-	        creature->getZone() == ZONE_PROTECTION || !canSeeCreature(creature)) {
+			(creature->getZone() == ZONE_PROTECTION && getName() != "Market") || !canSeeCreature(creature)) {
 		return false;
 	}
 

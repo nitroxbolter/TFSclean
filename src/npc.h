@@ -127,6 +127,9 @@ class Npc final : public Creature
 		const std::string& getNameDescription() const override {
 			return name;
 		}
+		const std::string& getMarketDescription() const override {
+			return name;
+		}
 
 		CreatureType_t getType() const override {
 			return CREATURETYPE_NPC;

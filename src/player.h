@@ -132,6 +132,10 @@ class Player final : public Creature, public Cylinder
 		}
 		std::string getDescription(int32_t lookDistance) const override;
 
+		const std::string& getMarketDescription() const override {
+			return name;
+		}
+
 		CreatureType_t getType() const override {
 			return CREATURETYPE_PLAYER;
 		}
@@ -706,14 +710,14 @@ class Player final : public Creature, public Cylinder
 				}
 			}
 		}
-		void sendRemoveTileThing(const Position& pos, int32_t stackpos) {
-			if (stackpos != -1 && client) {
-				client->sendRemoveTileThing(pos, stackpos);
-			}
-		}
 		void sendUpdateTileCreature(const Creature* creature) {
 			if (client) {
 				client->sendUpdateTileCreature(creature->getPosition(), creature->getTile()->getClientIndexOfCreature(this, creature), creature);
+			}
+		}
+		void sendRemoveTileThing(const Position& pos, int32_t stackpos) {
+			if (stackpos != -1 && client) {
+				client->sendRemoveTileThing(pos, stackpos);
 			}
 		}
 		void sendRemoveTileCreature(const Creature* creature, const Position& pos, int32_t stackpos) {
@@ -1190,6 +1194,7 @@ class Player final : public Creature, public Cylinder
 		uint32_t getItemTypeCount(uint16_t itemId, int32_t subType = -1) const override;
 		std::map<uint32_t, uint32_t>& getAllItemTypeCount(std::map<uint32_t, uint32_t>& countMap) const override;
 		Thing* getThing(size_t index) const override;
+		Item* getItemByUID(uint32_t uid) const;
 
 		void internalAddThing(Thing* thing) override;
 		void internalAddThing(uint32_t index, Thing* thing) override;

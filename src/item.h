@@ -882,6 +882,14 @@ class Item : virtual public Thing
 			return items[id].hitChance;
 		}
 
+		void setRealUID(uint32_t uid) {
+			realUId = uid;
+		}
+
+		uint32_t getRealUID() const {
+			return realUId;
+		}
+
 		uint32_t getWorth() const;
 		LightInfo getLightInfo() const;
 
@@ -1050,6 +1058,7 @@ class Item : virtual public Thing
 		uint8_t count = 1; // number of stacked items
 
 		bool loadedFromMap = false;
+		uint32_t realUId = 0;
 
 		//Don't add variables here, use the ItemAttribute class.
 };
