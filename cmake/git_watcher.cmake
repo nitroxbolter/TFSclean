@@ -103,7 +103,7 @@ set(_state_variable_names
 #              "exit_code" and "output" variables.
 macro(RunGitCommand)
     execute_process(COMMAND
-            "${GIT_EXECUTABLE}" ${ARGV}
+            "${GIT_EXECUTABLE}" ${ARGN}
             WORKING_DIRECTORY "${_working_dir}"
             RESULT_VARIABLE exit_code
             OUTPUT_VARIABLE output
@@ -140,37 +140,37 @@ function(GetGitState _working_dir)
 
     # There's a long list of attributes grabbed from git show.
     set(object HEAD)
-    RunGitCommand(show -s "--format=%H" ${object})
+    RunGitCommand(show -s --format=%H ${object})
     if(exit_code EQUAL 0)
         set(ENV{GIT_HEAD_SHA1} ${output})
     endif()
 
-    RunGitCommand(show -s "--format=%an" ${object})
+    RunGitCommand(show -s --format=%an ${object})
     if(exit_code EQUAL 0)
         set(ENV{GIT_AUTHOR_NAME} "${output}")
     endif()
 
-    RunGitCommand(show -s "--format=%ae" ${object})
+    RunGitCommand(show -s --format=%ae ${object})
     if(exit_code EQUAL 0)
         set(ENV{GIT_AUTHOR_EMAIL} "${output}")
     endif()
 
-    RunGitCommand(show -s "--format=%cI" ${object})
+    RunGitCommand(show -s --format=%cI ${object})
     if(exit_code EQUAL 0)
         set(ENV{GIT_COMMIT_DATE_ISO8601} "${output}")
     endif()
 
-    RunGitCommand(show -s "--format=%s" ${object})
+    RunGitCommand(show -s --format=%s ${object})
     if(exit_code EQUAL 0)
         set(ENV{GIT_COMMIT_SUBJECT} "${output}")
     endif()
 
-    RunGitCommand(show -s "--format=%b" ${object})
+    RunGitCommand(show -s --format=%b ${object})
     if(exit_code EQUAL 0)
         set(ENV{GIT_COMMIT_BODY} "${output}")
     endif()
 
-    RunGitCommand(describe --tags "--match=v*" ${object})
+    RunGitCommand(describe --tags --match=v* ${object})
     if(exit_code EQUAL 0)
         set(ENV{GIT_DESCRIBE} "${output}")
     endif()

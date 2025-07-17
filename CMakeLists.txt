@@ -92,7 +92,7 @@ endif ()
 ### Git Version ###
 # Define the two required variables before including
 # the source code for watching a git repository.
-option(SKIP_GIT "Skip checking for git updates" OFF)
+option(SKIP_GIT "Skip checking for git updates" ON)
 if(NOT SKIP_GIT)
 	set(PRE_CONFIGURE_FILE "cmake/gitmetadata.h.in")
 	set(POST_CONFIGURE_FILE "${CMAKE_CURRENT_BINARY_DIR}/gitmetadata.h")

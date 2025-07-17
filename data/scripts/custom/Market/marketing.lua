@@ -205,10 +205,13 @@ function creatureEvent.onExtendedOpcode(player, opcode, buffer)
 		elseif buffer_decode.action == "Remove" then
 
 			if not Game.removeMarketingOffer(player:getName(), buffer_decode.data.uid) then
-				local msg = json.encode({action = "msg", data = {msg = "You do not have enough CAP \n        to receive this item."}})
+				local msg = json.encode({action = "msg", data = {msg = "Failed to remove item from market. \n        Please try again."}})
 				player:sendExtendedOpcode(96, msg)
 				return false
 			end
+
+			local msg = json.encode({action = "msg", data = {msg = "Item removed from market and \n        returned to your backpack."}})
+			player:sendExtendedOpcode(96, msg)
 
 			for _, pid in pairs(Game.getPlayers()) do
 				local refresh = json.encode({action = "Refresh", market = buffer_decode.market, data = Game.getMarketingOffers(player:getName())})

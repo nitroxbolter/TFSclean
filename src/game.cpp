@@ -5977,6 +5977,57 @@ bool Game::removeMarketingOffer(std::string marketName, uint32_t uid)
 {
 	Database& db = Database::getInstance();
 	std::lock_guard<std::mutex> lock(marketingMutex);
+	
+	auto market = marketing.find(marketName);
+	if (market != marketing.end()) {
+		auto offer = market->second.find(uid);
+		if (offer != market->second.end()) {
+			Item* item = offer->second.item;
+			Item* return_item = Item::CreateItem(item->getID(), item->getSubType());
+			if (return_item) {
+				PropWriteStream propWriteStream;
+				propWriteStream.clear();
+				item->serializeAttr(propWriteStream);
+				size_t attributesSize;
+				const char* attr = propWriteStream.getStream(attributesSize);
+				PropStream propStream;
+				propStream.init(attr, attributesSize);
+				return_item->unserializeAttr(propStream);
+				return_item->setItemCount(item->getCharges() > 1 ? item->getCharges() : item->getItemCount());
+				
+				if (return_item->getContainer() && offer->second.subItems.size() > 0) {
+					for (size_t i = 0; i < offer->second.subItems.size(); i++) {
+						Item* subItem = offer->second.subItems[i];
+						Item* return_subItem = Item::CreateItem(subItem->getID(), subItem->getSubType());
+						if (return_subItem) {
+							PropWriteStream subPropWriteStream;
+							subPropWriteStream.clear();
+							subItem->serializeAttr(subPropWriteStream);
+							size_t subAttributesSize;
+							const char* subAttr = subPropWriteStream.getStream(subAttributesSize);
+							PropStream subPropStream;
+							subPropStream.init(subAttr, subAttributesSize);
+							return_subItem->unserializeAttr(subPropStream);
+							return_subItem->setItemCount(subItem->getCharges() > 1 ? subItem->getCharges() : subItem->getItemCount());
+							g_game.internalAddItem(return_item->getContainer(), return_subItem, INDEX_WHEREEVER, 0);
+						}
+					}
+				}
+				
+				Player* player = getPlayerByName(marketName);
+				if (player) {
+					if (player->hasCapacity(return_item, return_item->getItemCount())) {
+						internalAddItem(player, return_item, INDEX_WHEREEVER, 0);
+					} else {
+						internalAddItem(player->getTile(), return_item, INDEX_WHEREEVER, FLAG_NOLIMIT);
+					}
+				} else {
+					ReleaseItem(return_item);
+				}
+			}
+		}
+	}
+	
 	bool dbSuccess = db.executeQuery(fmt::format("UPDATE `player_marketing` SET `completed` = 'true' WHERE `player_name` = {:s} AND `uid` = {:d}", db.escapeString(marketName), uid));
 	if (dbSuccess) {
 		auto market = marketing.find(marketName);
