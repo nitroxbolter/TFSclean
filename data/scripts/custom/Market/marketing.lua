@@ -223,31 +223,64 @@ function creatureEvent.onExtendedOpcode(player, opcode, buffer)
 			local player_market = Player(buffer_decode.market)
 			if not player_market then
 				local priceAmount = 0
+				local targetItem = nil
 				for x, offer in pairs(Game.getMarketingOffers(buffer_decode.market)) do
 					if offer.uid == buffer_decode.data.uid then
 						priceAmount = offer.price*buffer_decode.data.quant
+						targetItem = offer
+						break
 					end
 				end
-				if player:getMoney() >= priceAmount then
-					if not Game.buyMarketingOffer(player, buffer_decode.market, buffer_decode.data.uid, buffer_decode.data.quant) then
-						local msg = json.encode({action = "msg", data = {msg = "You do not have enough CAP \n        to receive this item."}})
-						player:sendExtendedOpcode(96, msg)
-						return false
-					end
-
-					player:removeMoney(priceAmount)
-
-					for _, pid in pairs(Game.getPlayers()) do
-						local refresh = json.encode({action = "Refresh", market = buffer_decode.market, data = Game.getMarketingOffers(buffer_decode.market)})
-						pid:sendExtendedOpcode(96, refresh)
-					end
-
-					local coins = json.encode({action = "coins", data = {gold = player:getMoney()}})
-					player:sendExtendedOpcode(96, coins)
-				else
-					local msg = json.encode({action = "msg", data = {msg = "You do not have all the gold coins \n        to purchase this item."}})
+				
+				if not targetItem then
+					local msg = json.encode({action = "msg", data = {msg = "Item not found in market."}})
 					player:sendExtendedOpcode(96, msg)
+					return false
 				end
+				
+				local totalMoney = player:getMoney() + player:getBankBalance()
+				if totalMoney < priceAmount then
+					local msg = json.encode({action = "msg", data = {msg = "You do not have enough gold coins \n        to purchase this item."}})
+					player:sendExtendedOpcode(96, msg)
+					return false
+				end
+				
+				local itemType = ItemType(targetItem.id)
+				local itemWeight = itemType:getWeight() * buffer_decode.data.quant
+				local playerCap = player:getFreeCapacity()
+				
+				if playerCap < itemWeight then
+					local msg = json.encode({action = "msg", data = {msg = "You have found a " .. itemType:getName() .. " weighing " .. (itemWeight / 100) .. " oz. It's too heavy."}})
+					player:sendExtendedOpcode(96, msg)
+					return false
+				end
+				
+				local backpack = player:getSlotItem(CONST_SLOT_BACKPACK)
+				if not backpack or backpack:getEmptySlots(false) < 1 then
+					local msg = json.encode({action = "msg", data = {msg = "Your main backpack is full. You need to free up 1 available slot to get " .. itemType:getName() .. "."}})
+					player:sendExtendedOpcode(96, msg)
+					return false
+				end
+				
+				if not Game.buyMarketingOffer(player, buffer_decode.market, buffer_decode.data.uid, buffer_decode.data.quant) then
+					local msg = json.encode({action = "msg", data = {msg = "Failed to purchase item. \n        Please try again."}})
+					player:sendExtendedOpcode(96, msg)
+					return false
+				end
+
+				if not player:removeTotalMoney(priceAmount) then
+					local msg = json.encode({action = "msg", data = {msg = "Failed to process payment. \n        Please try again."}})
+					player:sendExtendedOpcode(96, msg)
+					return false
+				end
+
+				for _, pid in pairs(Game.getPlayers()) do
+					local refresh = json.encode({action = "Refresh", market = buffer_decode.market, data = Game.getMarketingOffers(buffer_decode.market)})
+					pid:sendExtendedOpcode(96, refresh)
+				end
+
+				local coins = json.encode({action = "coins", data = {gold = player:getMoney()}})
+				player:sendExtendedOpcode(96, coins)
 			end
 
 		elseif buffer_decode.action == "Start" then
@@ -269,7 +302,7 @@ function creatureEvent.onExtendedOpcode(player, opcode, buffer)
 				return result
 			end
 
-				-- Permitir criação do Market em qualquer lugar (incluindo PZ)
+
 				local inMarketArea = true
 				
 				local randomPos = {
@@ -303,14 +336,15 @@ function creatureEvent.onExtendedOpcode(player, opcode, buffer)
 				end
 
 
+				local playerOutfit = player:getOutfit()
 				local market = Game.createMonster("Market", player:getPosition(), true, true)
 				if market then
 					market:rename(player:getName())
 					market:teleportTo(player:getPosition())
+					market:setOutfit(playerOutfit)
 					market:setMarketDescription(formatMarketDescription(buffer_decode.description))
 					player:remove()
 				else
-					-- Tentar criar em uma posição diferente se falhar
 					local altPos = Position(player:getPosition().x + 1, player:getPosition().y, player:getPosition().z)
 					local marketAlt = Game.createMonster("Market", altPos, true, true)
 					if marketAlt then

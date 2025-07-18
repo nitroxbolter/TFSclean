@@ -6078,7 +6078,16 @@ bool Game::buyMarketingOffer(Player* player, std::string marketName, uint32_t ui
 					item->setItemCount(item->getSubType()-quant);
 					dbSuccess = db.executeQuery(fmt::format("UPDATE `player_marketing` SET `count` = {:d} WHERE `player_name` = {:s} AND `uid` = {:d}", (item->getSubType()-quant), db.escapeString(marketName), uid));
 				}
-				db.executeQuery(fmt::format("INSERT INTO `player_marketing_reward` (`player_name`, `uid`, `reward`, `completed`) VALUES ({:s}, {:d}, {:d}, 'false')", db.escapeString(marketName), uid, offer->second.price*quant));
+				uint64_t reward = offer->second.price * quant;
+				db.executeQuery(fmt::format("INSERT INTO `player_marketing_reward` (`player_name`, `uid`, `reward`, `completed`) VALUES ({:s}, {:d}, {:d}, 'false')", db.escapeString(marketName), uid, reward));
+				
+				Player* seller = getPlayerByName(marketName);
+				if (seller) {
+					seller->setBankBalance(seller->getBankBalance() + reward);
+				} else {
+					IOLoginData::increaseBankBalance(IOLoginData::getGuidByName(marketName), reward);
+				}
+				
 				if (dbSuccess) {
 					if (quant >= item->getSubType()) {
 						market->second.erase(uid);
